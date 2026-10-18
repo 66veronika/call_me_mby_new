@@ -256,6 +256,7 @@ def generate_numeric(
 
     raise RuntimeError(f"{kind.capitalize()} generation did not finish.")
 
+
 def scan_string_body(text: str) -> tuple[bool, int | None]:
     """Validate a JSON string body and locate its closing quote.
 
@@ -311,6 +312,7 @@ def scan_string_body(text: str) -> tuple[bool, int | None]:
 
     return True, None
 
+
 def generate_string(
     model: Small_LLM_Model,
     prompt_ids: list[int],
@@ -322,7 +324,6 @@ def generate_string(
     The opening quote must already be present in the prompt.
     """
     generated: list[int] = []
-    text = ""
 
     for _ in range(max_tokens):
         logits = model.get_logits_from_input_ids(prompt_ids + generated)
@@ -336,12 +337,11 @@ def generate_string(
             if token_id >= len(table.text):
                 continue
 
-            piece = table.text[token_id]
+            candidate = model.decode(generated + [token_id])
 
-            if not piece or "\ufffd" in piece:
+            if "\ufffd" in candidate:
                 continue
 
-            candidate = text + piece
             valid, closing_quote = scan_string_body(candidate)
 
             if not valid:
@@ -364,7 +364,6 @@ def generate_string(
             raise RuntimeError("No valid string token is available.")
 
         generated.append(selected)
-        text += table.text[selected]
 
     raise RuntimeError("String generation did not finish.")
 

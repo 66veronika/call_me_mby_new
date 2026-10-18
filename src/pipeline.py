@@ -14,6 +14,50 @@ from src.models import (
 from src.vocab import TokenTable
 
 
+def validate_parameters(
+    function: FunctionDefinition,
+    parameters: dict[str, object],
+) -> None:
+    """Validate generated arguments against the function schema."""
+    expected_names = set(function.parameters)
+    actual_names = set(parameters)
+
+    if actual_names != expected_names:
+        raise ValueError(
+            "Parameter names do not match the function definition."
+        )
+
+    for name, definition in function.parameters.items():
+        value = parameters[name]
+        parameter_type = definition.type.lower()
+
+        if parameter_type == "string":
+            valid = isinstance(value, str)
+        elif parameter_type == "number":
+            valid = (
+                isinstance(value, (int, float))
+                and not isinstance(value, bool)
+            )
+        elif parameter_type == "integer":
+            valid = (
+                isinstance(value, int)
+                and not isinstance(value, bool)
+            )
+        elif parameter_type == "boolean":
+            valid = isinstance(value, bool)
+        else:
+            raise ValueError(
+                f"Unsupported parameter type: {definition.type}"
+            )
+
+        if not valid:
+            raise ValueError(
+                f"Invalid type for parameter '{name}': "
+                f"expected {parameter_type}, "
+                f"got {type(value).__name__}."
+            )
+
+
 def process_prompts(
     model: Small_LLM_Model,
     functions: list[FunctionDefinition],
@@ -45,6 +89,8 @@ def process_prompts(
                 function,
                 table,
             )
+
+            validate_parameters(function, parameters)
 
             result = FunctionCallResult(
                 prompt=item.prompt,

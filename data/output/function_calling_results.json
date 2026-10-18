@@ -1,18 +1,18 @@
 [
   {
     "prompt": "What is the sum of 2 and 3?",
-    "name": "fn_add_numbers",
+    "name": "fn_substitute_string_with_regex",
     "parameters": {
-      "a": 2.0,
-      "b": 3.0
+      "source_string": "2 + 3",
+      "regex": "2 +",
+      "replacement": "X"
     }
   },
   {
     "prompt": "What is the sum of 265 and 345?",
-    "name": "fn_add_numbers",
+    "name": "fn_get_square_root",
     "parameters": {
-      "a": 265.0,
-      "b": 345.0
+      "a": 265.0
     }
   },
   {

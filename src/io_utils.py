@@ -19,6 +19,7 @@ def load_json(path: str) -> Any:
         print(f"Error: invalid JSON in: {path}")
         return None
 
+
 def write_results(
     path: str,
     results: list[FunctionCallResult],
@@ -44,6 +45,7 @@ def write_results(
                 file,
                 indent=2,
                 ensure_ascii=False,
+                allow_nan=False,
             )
 
             file.write("\n")
