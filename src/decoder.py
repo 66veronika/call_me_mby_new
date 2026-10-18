@@ -256,10 +256,21 @@ def generate_numeric(
 
     raise RuntimeError(f"{kind.capitalize()} generation did not finish.")
 
-
 def scan_string_body(text: str) -> tuple[bool, int | None]:
-    """Validate a JSON string body and find its closing quote."""
+    """Validate a JSON string body and locate its closing quote.
+
+    Incomplete but valid prefixes are accepted so generation can continue.
+
+    Args:
+        text: Generated text after the opening JSON quote.
+
+    Returns:
+        A tuple containing whether the text is valid so far and the
+        index of the closing quote, if one has been generated.
+    """
     index = 0
+    hex_digits = "0123456789abcdefABCDEF"
+    simple_escapes = '"\\/bfnrt'
 
     while index < len(text):
         char = text[index]
@@ -270,34 +281,35 @@ def scan_string_body(text: str) -> tuple[bool, int | None]:
         if ord(char) < 32:
             return False, None
 
-        if char == "\\":
-            if index + 1 == len(text):
-                return True, None
+        if char != "\\":
+            index += 1
+            continue
 
-            next_char = text[index + 1]
+        # A trailing backslash is a valid incomplete prefix.
+        if index + 1 >= len(text):
+            return True, None
 
-            if next_char == "u":
-                hex_part = text[index + 2:index + 6]
+        escape = text[index + 1]
 
-                if not all(c in "0123456789abcdefABCDEF" for c in hex_part):
-                    return False, None
-
-                if len(hex_part) < 4:
-                    return True, None
-
-                index += 6
-                continue
-
-            if next_char not in '"\\/bfnrt':
-                return False, None
-
+        if escape in simple_escapes:
             index += 2
             continue
 
-        index += 1
+        if escape != "u":
+            return False, None
+
+        # A Unicode escape requires exactly four hexadecimal digits.
+        hex_part = text[index + 2:index + 6]
+
+        if any(char not in hex_digits for char in hex_part):
+            return False, None
+
+        if len(hex_part) < 4:
+            return True, None
+
+        index += 6
 
     return True, None
-
 
 def generate_string(
     model: Small_LLM_Model,
