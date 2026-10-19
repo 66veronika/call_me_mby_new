@@ -6,7 +6,10 @@ install:
 	uv sync
 
 run:
-	uv run python -m src
+	uv run python -m src \
+		--functions_definition /home/vskopova/tr/data/input/functions_definition.json \
+		--input /home/vskopova/tr/data/input/function_calling_tests.json \
+		--output /home/vskopova/tr/data/output/function_calling_tests.json
 
 debug:
 	uv run python -m pdb -m src

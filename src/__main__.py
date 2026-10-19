@@ -98,6 +98,8 @@ def main() -> None:
 
     except Exception as error:
         print(f"Error: {error}")
+    except KeyboardInterrupt:
+        print("Interrupted")
 
 
 if __name__ == "__main__":
