@@ -33,11 +33,13 @@ def validate_parameters(
 
         if parameter_type == "string":
             valid = isinstance(value, str)
-        elif parameter_type == "number":
+        
+        elif parameter_type in ("number", "float"):
             valid = (
                 isinstance(value, (int, float))
                 and not isinstance(value, bool)
             )
+
         elif parameter_type == "integer":
             valid = (
                 isinstance(value, int)

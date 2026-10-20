@@ -443,10 +443,12 @@ def generate_parameters(
             value = generate_string(
                 model, encode_text(model, context + '"'), table
             )
-        elif parameter_type == "number":
+        
+        elif parameter_type in ("number", "float"):
             value = generate_numeric(
                 model, encode_text(model, context), table
             )
+
         elif parameter_type == "integer":
             value = generate_numeric(
                 model, encode_text(model, context), table, integer=True
