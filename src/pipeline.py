@@ -33,7 +33,7 @@ def validate_parameters(
 
         if parameter_type == "string":
             valid = isinstance(value, str)
-        
+
         elif parameter_type in ("number", "float"):
             valid = (
                 isinstance(value, (int, float))
@@ -73,9 +73,10 @@ def process_prompts(
     }
 
     results: list[FunctionCallResult] = []
-    failures = 0
 
     for item in prompts:
+        if not item.prompt:
+            continue
         try:
             function_name = choose_function_name(
                 model,
@@ -108,18 +109,11 @@ def process_prompts(
             )
 
         except Exception as error:
-            failures += 1
 
             print(
                 f"Error processing "
                 f"'{item.prompt}': {error}",
                 file=sys.stderr,
             )
-
-    if failures:
-        raise RuntimeError(
-            f"{failures} prompt(s) failed. "
-            "Output file was not written."
-        )
 
     return results

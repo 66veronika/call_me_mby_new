@@ -5,6 +5,7 @@ from llm_sdk import Small_LLM_Model
 
 from src.models import FunctionDefinition
 from src.vocab import TokenTable
+import math
 
 DIGITS = "0123456789"
 
@@ -191,10 +192,23 @@ def is_complete_numeric(text: str, *, integer: bool = False) -> bool:
     )
 
 
-def parse_numeric(text: str, *, integer: bool) -> int | float:
-    """Convert a complete numeric string to int or float."""
-    value = normalized_number(text)
-    return int(value) if integer else float(value)
+def parse_numeric(
+    text: str,
+    *,
+    integer: bool,
+) -> int | float:
+    """Convert a complete numeric string safely."""
+    value = text.lstrip(" ")
+
+    if integer:
+        return int(value)
+
+    number = float(value)
+
+    if not math.isfinite(number):
+        raise ValueError("Generated number is not finite.")
+
+    return number
 
 
 def best_stop_score(
@@ -443,7 +457,7 @@ def generate_parameters(
             value = generate_string(
                 model, encode_text(model, context + '"'), table
             )
-        
+
         elif parameter_type in ("number", "float"):
             value = generate_numeric(
                 model, encode_text(model, context), table
