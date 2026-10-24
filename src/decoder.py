@@ -275,13 +275,6 @@ def scan_string_body(text: str) -> tuple[bool, int | None]:
     """Validate a JSON string body and locate its closing quote.
 
     Incomplete but valid prefixes are accepted so generation can continue.
-
-    Args:
-        text: Generated text after the opening JSON quote.
-
-    Returns:
-        A tuple containing whether the text is valid so far and the
-        index of the closing quote, if one has been generated.
     """
     index = 0
     hex_digits = "0123456789abcdefABCDEF"

@@ -1,8 +1,7 @@
 import json
-from typing import Any
-
-from llm_sdk import Small_LLM_Model
 from pydantic import BaseModel
+from typing import Any
+from llm_sdk import Small_LLM_Model
 
 
 class TokenTable(BaseModel):
